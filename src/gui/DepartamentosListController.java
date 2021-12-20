@@ -26,7 +26,7 @@ import javafx.stage.Stage;
 import model.entities.Departamentos;
 import model.services.DepartamentosService;
 
-public class DepartametnListController implements Initializable {
+public class DepartamentosListController implements Initializable {
 	
 	private DepartamentosService service;
 	
@@ -47,7 +47,8 @@ public class DepartametnListController implements Initializable {
 	@FXML
 	public void onBtNovoAction(ActionEvent event) {
 		Stage parentStage = Utils.currentStage(event);
-		createDialogForm("/gui/DepartamentosForm.fxml", parentStage);
+		Departamentos obj = new Departamentos();
+		createDialogForm(obj, "/gui/DepartamentosForm.fxml", parentStage);
 	}
 	
 	public void setDepartamentService(DepartamentosService service) {
@@ -77,10 +78,14 @@ public class DepartametnListController implements Initializable {
 		tableViewDepartament.setItems(obsList);
 	}
 	
-	private void createDialogForm(String absoluteName, Stage parentStage) {
+	private void createDialogForm(Departamentos obj, String absoluteName, Stage parentStage) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
+			
+			DepartamentosFormController controller = loader.getController();
+			controller.setDepartamentos(obj);
+			controller.updateFormData();
 			
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Departament data");
