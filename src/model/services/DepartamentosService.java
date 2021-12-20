@@ -16,5 +16,12 @@ public class DepartamentosService {
 		
 		
 	}
+	public void saveOrUpdate(Departamentos obj) {
+		if(obj.getId() == null) {
+			dao.insert(obj);
+		}else {
+			dao.update(obj);
+		}
+	}
 	
 }
