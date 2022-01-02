@@ -3,7 +3,9 @@ package gui;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import db.DbException;
 import gui.listeners.DataChangeListener;
@@ -18,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Departamentos;
+import model.exceptions.ValidationException;
 import model.services.DepartamentosService;
 
 public class DepartamentosFormController implements Initializable {
@@ -69,6 +72,11 @@ public class DepartamentosFormController implements Initializable {
 			notifyDataChangeListeners();
 			Utils.currentStage(event).close();
 		}
+		
+		catch (ValidationException e) {
+			setErrorMessages(e.getErrors());
+		}
+		
 		catch(DbException e) {
 			Alerts.showAlert("Error Saving Object", null, e.getMessage(), AlertType.ERROR);
 		}
@@ -84,8 +92,18 @@ public class DepartamentosFormController implements Initializable {
 	private Departamentos getFormData() {
 		Departamentos obj = new Departamentos();
 		
+		ValidationException exception = new ValidationException("Validation error!");
+		
 		obj.setId(Utils.tryParseToInt(txtId.getText()));
+		
+		if(txtNome.getText() == null || txtNome.getText().trim().equals("")) {
+			exception.addError("Nome", "Este campo não pode ser vazio");
+		}
 		obj.setName(txtNome.getText());
+		
+		if (exception.getErrors().size() > 0) {
+			throw exception;
+		}
 		return obj;
 	}
 
@@ -110,6 +128,14 @@ public class DepartamentosFormController implements Initializable {
 		}
 		txtId.setText(String.valueOf(entity.getId()));
 		txtNome.setText(entity.getNome());
+	}
+	
+	private void setErrorMessages(Map<String, String> errors) {
+		Set<String> fields = errors.keySet();
+		
+		if (fields.contains("nome")) {
+			labelErrorName.setText(errors.get("nome"));
+		}
 	}
 
 }
